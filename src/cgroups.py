@@ -15,6 +15,11 @@ def memory_limit(limit):
     os.chmod(cgroups_mem_dir, 0o700)
     print("$ chmod 700 " + cgroups_mem_dir)
 
+def memory_usage():
+    with open(cgroups_mem_dir + "/memory.usage_in_bytes", "r") as f:
+        mem_usage = f.read()
+    print("Memory usage: " + mem_usage)
+    return mem_usage
 
 #os.mkdir(cgroups_mem_dir)
 # pidをファイル名にして、cgroupsディレクトリに作成する("/sys/fs/cgroup/memory/" & $pid)
