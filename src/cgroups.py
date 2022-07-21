@@ -21,6 +21,20 @@ def memory_usage():
     print("Memory usage: " + mem_usage)
     return mem_usage
 
+def cpu_limit(limit):
+    with open(cgroups_mem_dir + "/cpu.shares", "w") as f:
+        cpu_limit = limit * 1000
+        f.write(str(cpu_limit))
+    print("CPU limit set to: " + str(cpu_limit))
+    os.chmod(cgroups_mem_dir, 0o700)
+    print("$ chmod 700 " + cgroups_mem_dir)
+
+def cpu_usage():
+    with open(cgroups_mem_dir + "/cpu.usage_in_usermode", "r") as f:
+        cpu_usage = f.read()
+    print("CPU usage: " + cpu_usage)
+    return cpu_usage
+
 #os.mkdir(cgroups_mem_dir)
 # pidをファイル名にして、cgroupsディレクトリに作成する("/sys/fs/cgroup/memory/" & $pid)
 # chmod 700 cgroupsディレクトリ
