@@ -44,8 +44,9 @@ def cpu_limit(cpu_limit):
     if not os.path.exists(cgroups_cpu_dir):
         os.makedirs(cgroups_cpu_dir)
     # cpu.cfs_quota_usにCPU制限を設定
+    # 注意：マルチコアの場合、全 CPU コアを対象に分配される
     with open(cgroups_cpu_dir + "/cpu.cfs_quota_us", "w") as f:
-        # 下限は、1000 マイクロ秒(0.001秒)
+        # 下限は、1000 マイクロ秒(0.001秒)、上限は、1秒
         f.write(str(cpu_limit * 1000))
     print("CPU limit set to: " + str(cpu_limit * 1000))
     # 権限を700に設定
