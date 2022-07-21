@@ -11,7 +11,9 @@ def memory_limit(limit):
     with open(cgroups_mem_dir + "/memory.limit_in_bytes", "w") as f:
         f.write(str(limit))
     print("Memory limit set to: " + str(limit))
-    return
+    os.chmod(cgroups_mem_dir, 0o700)
+    print("$ chmod 700 " + cgroups_mem_dir)
+
 
 #os.mkdir(cgroups_mem_dir)
 # pidをファイル名にして、cgroupsディレクトリに作成する("/sys/fs/cgroup/memory/" & $pid)
