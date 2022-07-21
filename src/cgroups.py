@@ -9,8 +9,9 @@ def memory_limit(limit):
     if not os.path.exists(cgroups_mem_dir):
         os.makedirs(cgroups_mem_dir)
     with open(cgroups_mem_dir + "/memory.limit_in_bytes", "w") as f:
-        f.write(str(limit) * 1024 * 1024)
-    print("Memory limit set to: " + str(limit))
+        mem_limit = str(limit) * 1024 * 1024
+        f.write(mem_limit)
+    print("Memory limit set to: " + str(mem_limit))
     os.chmod(cgroups_mem_dir, 0o700)
     print("$ chmod 700 " + cgroups_mem_dir)
 
