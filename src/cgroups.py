@@ -20,6 +20,7 @@ def memory_limit(memory_limit):
         os.makedirs(cgroups_mem_dir)
     # memory.limit_in_bytesにメモリ制限を設定
     with open(cgroups_mem_dir + "/memory.limit_in_bytes", "w") as f:
+        # 下限は、1 メガバイト(1MB)
         f.write(memory_limit * 1024 * 1024)
     print("Memory limit set to: " + str(memory_limit * 1024 * 1024))
     # 権限を700に設定
@@ -44,6 +45,7 @@ def cpu_limit(cpu_limit):
         os.makedirs(cgroups_cpu_dir)
     # cpu.cfs_quota_usにCPU制限を設定
     with open(cgroups_cpu_dir + "/cpu.cfs_quota_us", "w") as f:
+        # 下限は、1000 マイクロ秒(0.01秒)
         f.write(str(cpu_limit * 1000))
     print("CPU limit set to: " + str(cpu_limit * 1000))
     # 権限を700に設定
