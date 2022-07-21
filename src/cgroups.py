@@ -1,47 +1,56 @@
-# Create dir for set memory limit in cgroups dir
-
 import os
 
-pid = os.getpid()
-cgroups_mem_dir = "/sys/fs/cgroup/memory/" + str(pid)
 
-def memory_limit(limit):
+# プロセスIDを取得
+pid = os.getpid()
+# メモリ設定用のcgroupsディレクトリのパス
+cgroups_mem_dir = "/sys/fs/cgroup/memory/" + str(pid)
+# CPU設定用のcgroupsディレクトリのパス
+cgroups_cpu_dir = "/sys/fs/cgroup/cpu/" + str(pid)
+
+# メモリ制限の設定
+def memory_limit(memory_limit):
+    # ディレクトリが存在しない場合は作成
     if not os.path.exists(cgroups_mem_dir):
         os.makedirs(cgroups_mem_dir)
+    # memory.limit_in_bytesにメモリ制限を設定
     with open(cgroups_mem_dir + "/memory.limit_in_bytes", "w") as f:
-        mem_limit = str(limit) * 1024 * 1024
-        f.write(mem_limit)
-    print("Memory limit set to: " + str(mem_limit))
+        f.write(memory_limit * 1024 * 1024)
+    print("Memory limit set to: " + str(memory_limit * 1024 * 1024))
+    # 権限を700に設定
     os.chmod(cgroups_mem_dir, 0o700)
     print("$ chmod 700 " + cgroups_mem_dir)
+    # pidをグループに追加すると、グループのメモリ制限が効く。
+    # cgroup v1, v2は、/cgroup.procsに書き込む
+    with open(cgroups_mem_dir + "/cgroup.procs", "w") as f:
+        f.write(str(pid))
 
+# メモリの使用量を取得
 def memory_usage():
     with open(cgroups_mem_dir + "/memory.usage_in_bytes", "r") as f:
         mem_usage = f.read()
     print("Memory usage: " + mem_usage)
     return mem_usage
 
-def cpu_limit(limit):
-    with open(cgroups_mem_dir + "/cpu.shares", "w") as f:
-        cpu_limit = limit * 1000
-        f.write(str(cpu_limit))
-    print("CPU limit set to: " + str(cpu_limit))
-    os.chmod(cgroups_mem_dir, 0o700)
-    print("$ chmod 700 " + cgroups_mem_dir)
+# CPU制限の設定
+def cpu_limit(cpu_limit):
+    # ディレクトリが存在しない場合は作成
+    if not os.path.exists(cgroups_cpu_dir):
+        os.makedirs(cgroups_cpu_dir)
+    # cpu.cfs_quota_usにCPU制限を設定
+    with open(cgroups_cpu_dir + "/cpu.cfs_quota_us", "w") as f:
+        f.write(str(cpu_limit * 1000))
+    print("CPU limit set to: " + str(cpu_limit * 1000))
+    # 権限を700に設定
+    os.chmod(cgroups_cpu_dir, 0o700)
+    print("$ chmod 700 " + cgroups_cpu_dir)
+    # pidをグループに追加すると、グループのCPU制限が効く。
+    with open(cgroups_cpu_dir + "/cgroup.procs", "w") as f:
+        f.write(str(pid))
 
+# CPUの使用量を取得
 def cpu_usage():
-    with open(cgroups_mem_dir + "/cpu.usage_in_usermode", "r") as f:
+    with open(cgroups_cpu_dir + "/cpu.cfs_quota_us", "r") as f:
         cpu_usage = f.read()
     print("CPU usage: " + cpu_usage)
     return cpu_usage
-
-#os.mkdir(cgroups_mem_dir)
-# pidをファイル名にして、cgroupsディレクトリに作成する("/sys/fs/cgroup/memory/" & $pid)
-# chmod 700 cgroupsディレクトリ
-# cgroupsMemDir & "/memory.limit_in_bytes"にメモリ制限を設定する
-# MBをバイトに変換するために(1024*1024)をかける
-
-# "/sys/fs/cgroup/cpu/" & $pid
-# chmod 700
-# cgroupsCpuDir & "/cpu.cfs_quota_us"にCPU制限を設定する
-# cpulimit = cpuLimit * 1000
